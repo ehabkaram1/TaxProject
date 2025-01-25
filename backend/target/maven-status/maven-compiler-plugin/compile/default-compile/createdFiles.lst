@@ -1,0 +1,6 @@
+com/irs/taxapp/controller/HomeController.class
+com/irs/taxapp/utils/W2Parser.class
+com/irs/taxapp/model/W2Data.class
+com/irs/taxapp/utils/W2Extractor.class
+com/irs/taxapp/TaxFilingApplication.class
+com/irs/taxapp/controller/W2UploadController.class
