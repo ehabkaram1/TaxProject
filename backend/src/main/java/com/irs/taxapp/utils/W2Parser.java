@@ -45,9 +45,14 @@ public class W2Parser {
         String employerEIN = extractPattern(extractedText, "(\\d{2}-\\d{7})"); // EIN format XX-XXXXXXX
         String employeeSSN = extractPattern(extractedText, "(XXX-XX-\\d{4})"); // SSN format XXX-XX-XXXX
     
+        // double wages = extractAmount(extractedText, "1\\s+Wages, tips, other comp");
+        // double federalTaxWithheld = extractAmount(extractedText, "2\\s+Federal income tax withheld");
+        // double stateWages = extractAmount(extractedText, "16\\s+State wages, tips, etc");
+        // double stateTaxWithheld = extractAmount(extractedText, "17\\s+State income tax");
+
         double wages = extractAmount(extractedText, "1\\s+Wages, tips, other comp");
         double federalTaxWithheld = extractAmount(extractedText, "2\\s+Federal income tax withheld");
-        double stateWages = extractAmount(extractedText, "16\\s+State wages, tips, etc");
+        double stateWages = extractAmount(extractedText, "16\\s+State wages, tips, etc\\.");
         double stateTaxWithheld = extractAmount(extractedText, "17\\s+State income tax");
     
         // Extract state dynamically
@@ -69,11 +74,46 @@ public class W2Parser {
     }
 
     // Extracts numeric values (e.g., wages, tax amounts)
+    // private static double extractAmount(String text, String label) {
+    //     Pattern p = Pattern.compile(label + "\\s+(\\d{1,7}\\.\\d{2})");
+    //     Matcher m = p.matcher(text);
+    //     return m.find() ? Double.parseDouble(m.group(1)) : 0.0;
+    // }
+
     private static double extractAmount(String text, String label) {
-        Pattern p = Pattern.compile(label + "\\s+(\\d{1,7}\\.\\d{2})");
-        Matcher m = p.matcher(text);
-        return m.find() ? Double.parseDouble(m.group(1)) : 0.0;
+        // Regex to match the label followed by spaces and the monetary amount
+        String regex = label + "\\s+([0-9,]+\\.\\d{2})";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            // Remove commas from the matched number and parse as double
+            String amount = matcher.group(1).replace(",", "");
+            return Double.parseDouble(amount);
+        }
+        return 0.0;
     }
+    
+
+    private static double extractAmountByPosition(String text, String label) {
+        Pattern labelPattern = Pattern.compile(label, Pattern.MULTILINE);
+        Matcher labelMatcher = labelPattern.matcher(text);
+    
+        if (labelMatcher.find()) {
+            int startIdx = labelMatcher.end(); // Start searching after the label
+            String afterLabel = text.substring(startIdx);
+    
+            // Look for the first valid number (wage/tax value)
+            Pattern numberPattern = Pattern.compile("\\$?\\d{1,7}(?:,\\d{3})*\\.\\d{2}");
+            Matcher numberMatcher = numberPattern.matcher(afterLabel);
+    
+            if (numberMatcher.find()) {
+                String amount = numberMatcher.group().replace(",", "").replace("$", "");
+                return Double.parseDouble(amount);
+            }
+        }
+        return 0.0;
+    }
+    
 
     private static String extractEmployerName(String text) {
         Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
