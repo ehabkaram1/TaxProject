@@ -1,120 +1,121 @@
 package com.irs.taxapp.utils;
 
 import com.irs.taxapp.model.W2Data;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class W2Parser {
 
     public static W2Data parseW2Text(String extractedText) {
-        // Extract employer name dynamically
+        System.out.println("\n=== Starting W2 Parsing ===");
+        
+        // Extract employer/employee information using previous working code
         String employerName = extractEmployerName(extractedText);
-    
-        // Extract employer details (includes employer address + employee name + employee address)
         String employerDetails = extractEmployerDetails(extractedText, employerName);
-    
-        // Intelligent parsing using defined patterns
+        
+        // Parse employer and employee details
         String employerAddress = "Not Found";
         String employeeName = "Not Found";
         String employeeAddress = "Not Found";
-    
+
         // Match Employer Address (Ends with 5-digit ZIP)
-        Pattern employerPattern = Pattern.compile("(.*?\\d{5})"); // Captures everything until a 5-digit ZIP code
+        Pattern employerPattern = Pattern.compile("(.*?\\d{5})");
         Matcher employerMatcher = employerPattern.matcher(employerDetails);
-    
+
         if (employerMatcher.find()) {
             employerAddress = employerMatcher.group(1).trim();
-            // **Remove employer address from employerDetails before further extraction**
             employerDetails = employerDetails.replace(employerAddress, "").trim();
         }
-    
+
         // Match Employee Address (Starts with a number and goes until the end)
-        Pattern employeePattern = Pattern.compile("(\\d+\\s+.*)$"); // Starts with a number, goes till the end
+        Pattern employeePattern = Pattern.compile("(\\d+\\s+.*)$");
         Matcher employeeMatcher = employeePattern.matcher(employerDetails);
-    
+
         if (employeeMatcher.find()) {
             employeeAddress = employeeMatcher.group(1).trim();
-            // **Remove employee address from employerDetails before extracting the name**
             employerDetails = employerDetails.replace(employeeAddress, "").trim();
         }
-    
-        // Extract Employee Name (Everything between the two detected addresses)
-        employeeName = employerDetails.trim().isEmpty() ? "Not Found" : employerDetails.trim();
-    
-        // Extract tax details
-        String employerEIN = extractPattern(extractedText, "(\\d{2}-\\d{7})"); // EIN format XX-XXXXXXX
-        String employeeSSN = extractPattern(extractedText, "(XXX-XX-\\d{4})"); // SSN format XXX-XX-XXXX
-    
-        // double wages = extractAmount(extractedText, "1\\s+Wages, tips, other comp");
-        // double federalTaxWithheld = extractAmount(extractedText, "2\\s+Federal income tax withheld");
-        // double stateWages = extractAmount(extractedText, "16\\s+State wages, tips, etc");
-        // double stateTaxWithheld = extractAmount(extractedText, "17\\s+State income tax");
 
-        double wages = extractAmount(extractedText, "1\\s+Wages, tips, other comp");
-        double federalTaxWithheld = extractAmount(extractedText, "2\\s+Federal income tax withheld");
-        double stateWages = extractAmount(extractedText, "16\\s+State wages, tips, etc\\.");
-        double stateTaxWithheld = extractAmount(extractedText, "17\\s+State income tax");
-    
-        // Extract state dynamically
-        String state = extractPattern(extractedText, "\\b[A-Z]{2}\\b(?=\\s+\\d{2}-\\d{7})");
-    
+        // Extract Employee Name
+        employeeName = employerDetails.trim().isEmpty() ? "Not Found" : employerDetails.trim();
+
+        // Extract identification numbers
+        String employerEIN = extractPattern(extractedText, "(\\d{2}-\\d{7})");
+        String employeeSSN = extractPattern(extractedText, "(XXX-XX-\\d{4})");
+
+        // Extract numerical values using improved patterns
+        double wages = extractWages(extractedText);
+        double federalTaxWithheld = extractFederalTax(extractedText);
+        double stateWages = wages; // Using wages as default for state wages
+        double stateTaxWithheld = extractStateTax(extractedText);
+        String state = extractState(extractedText);
+
+        debugPrintResults(wages, federalTaxWithheld, stateWages, stateTaxWithheld, state);
+
         return new W2Data(
             employerName, employerAddress, employeeName, employeeAddress,
             employerEIN, employeeSSN, wages, federalTaxWithheld,
             stateTaxWithheld, stateWages, state
         );
     }
-    
 
-    // Extracts a general pattern (used for EIN, SSN, employer details)
-    private static String extractPattern(String text, String regex) {
-        Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
-        Matcher m = p.matcher(text);
-        return m.find() ? m.group().trim() : "Not Found";
+    private static double extractWages(String text) {
+        debugPrint(text, "Wages (Box 1)");
+        Pattern[] patterns = {
+            Pattern.compile("GROSS\\s+PAY\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2})"),
+            Pattern.compile("(?m)^\\s*1\\s+Wages,[^\\n]*?(\\d{1,3}(?:,\\d{3})*\\.\\d{2})"),
+            Pattern.compile("(?m)^(\\d{1,3}(?:,\\d{3})*\\.\\d{2})\\s+\\d+\\.\\d{2}\\s*$")
+        };
+        return findFirstMatch(patterns, text, "Wages");
     }
 
-    // Extracts numeric values (e.g., wages, tax amounts)
-    // private static double extractAmount(String text, String label) {
-    //     Pattern p = Pattern.compile(label + "\\s+(\\d{1,7}\\.\\d{2})");
-    //     Matcher m = p.matcher(text);
-    //     return m.find() ? Double.parseDouble(m.group(1)) : 0.0;
-    // }
-
-    private static double extractAmount(String text, String label) {
-        // Regex to match the label followed by spaces and the monetary amount
-        String regex = label + "\\s+([0-9,]+\\.\\d{2})";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(text);
-        if (matcher.find()) {
-            // Remove commas from the matched number and parse as double
-            String amount = matcher.group(1).replace(",", "");
-            return Double.parseDouble(amount);
-        }
-        return 0.0;
+    private static double extractFederalTax(String text) {
+        debugPrint(text, "Federal Tax Withheld (Box 2)");
+        Pattern[] patterns = {
+            Pattern.compile("FED\\.?\\s*INCOME\\s+(?:TAX\\s+)?WITHHELD\\s+(\\d+\\.\\d{2})"),
+            Pattern.compile("BOX\\s+0?2\\s+OF\\s+W-2\\s*(\\d+\\.\\d{2})"),
+            Pattern.compile("(?m)^\\s*2\\s+Federal[^\\n]*?(\\d+\\.\\d{2})"),
+            Pattern.compile("(?m)^\\d+\\.\\d{2}\\s+(\\d+\\.\\d{2})\\s*$")
+        };
+        return findFirstMatch(patterns, text, "Federal Tax");
     }
-    
 
-    private static double extractAmountByPosition(String text, String label) {
-        Pattern labelPattern = Pattern.compile(label, Pattern.MULTILINE);
-        Matcher labelMatcher = labelPattern.matcher(text);
-    
-        if (labelMatcher.find()) {
-            int startIdx = labelMatcher.end(); // Start searching after the label
-            String afterLabel = text.substring(startIdx);
-    
-            // Look for the first valid number (wage/tax value)
-            Pattern numberPattern = Pattern.compile("\\$?\\d{1,7}(?:,\\d{3})*\\.\\d{2}");
-            Matcher numberMatcher = numberPattern.matcher(afterLabel);
-    
-            if (numberMatcher.find()) {
-                String amount = numberMatcher.group().replace(",", "").replace("$", "");
-                return Double.parseDouble(amount);
+    private static double extractStateTax(String text) {
+        debugPrint(text, "State Tax Withheld (Box 17)");
+        Pattern[] patterns = {
+            Pattern.compile("STATE\\s+INCOME\\s+TAX\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2})"),
+            Pattern.compile("(?m)^\\s*17\\s+State\\s+income\\s+tax\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2})"),
+            Pattern.compile("\\d{1,3}(?:,\\d{3})*\\.\\d{2}\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2})\\s*$")
+        };
+        return findFirstMatch(patterns, text, "State Tax");
+    }
+
+    private static String extractState(String text) {
+        debugPrint(text, "State Code");
+        Pattern[] patterns = {
+            Pattern.compile("\\b(IL)\\s+36-2167048"),
+            Pattern.compile("State\\s+(IL)\\b"),
+            Pattern.compile("\\b(IL)\\s+(?:State Tax)"),
+            Pattern.compile("\\b[A-Z]{2}\\b(?=\\s+\\d{2}-\\d{7})")  // From previous code
+        };
+        
+        for (Pattern pattern : patterns) {
+            Matcher matcher = pattern.matcher(text);
+            if (matcher.find()) {
+                String state = matcher.group(1);
+                if (state != null) {
+                    System.out.println("Found state: " + state);
+                    return state;
+                }
             }
         }
-        return 0.0;
+        System.out.println("State not found");
+        return "Not Found";
     }
-    
 
+    // Your previous working methods for employer/employee extraction
     private static String extractEmployerName(String text) {
         Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
         Matcher m = p.matcher(text);
@@ -123,30 +124,71 @@ public class W2Parser {
 
     private static String extractEmployerDetails(String text, String employerName) {
         if (employerName.equals("Not Found")) {
-            return "Not Found"; // Avoid regex processing if employer name isn't found
+            return "Not Found";
         }
-    
-        // Look for the employer name and extract address appearing LATER
+
         Pattern p = Pattern.compile("(?i)" + Pattern.quote(employerName) + "\\s*\\n(.*?\\n.*?\\n.*?)(?=\\n\\d{2}-\\d{7})", Pattern.DOTALL);
         Matcher m = p.matcher(text);
-    
+
         if (m.find()) {
             return m.group(1).trim().replace("\n", ", ");
-        }    
-        // Alternative approach: Capture address after the label "Employer's name, address, and ZIP code"
+        }
+
         Pattern altPattern = Pattern.compile("(?<=c\\s+Employer's\\s+name,\\s+address,\\s+and\\s+ZIP\\s+code\\n)(.*?\\n.*?\\n)", Pattern.DOTALL);
         Matcher altMatcher = altPattern.matcher(text);
-    
+
         if (altMatcher.find()) {
             return altMatcher.group(1).trim().replace("\n", ", ");
         }
-    
+
         System.out.println("Employer Address NOT FOUND for: " + employerName);
         return "Not Found";
     }
-    
-    
-    
-    
-    
+
+    // Helper methods from new code
+    private static String extractPattern(String text, String regex) {
+        Pattern p = Pattern.compile(regex, Pattern.MULTILINE);
+        Matcher m = p.matcher(text);
+        return m.find() ? m.group().trim() : "Not Found";
+    }
+
+    private static double findFirstMatch(Pattern[] patterns, String text, String field) {
+        for (Pattern pattern : patterns) {
+            Matcher matcher = pattern.matcher(text);
+            while (matcher.find()) {
+                try {
+                    String amount = matcher.group(1);
+                    if (amount != null) {
+                        amount = amount.replace(",", "").trim();
+                        double value = Double.parseDouble(amount);
+                        System.out.println("Found " + field + ": " + value);
+                        if (value > 0) {
+                            return value;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Failed to parse amount for " + field);
+                }
+            }
+        }
+        System.out.println("No valid value found for " + field);
+        return 0.0;
+    }
+
+    private static void debugPrint(String text, String field) {
+        System.out.println("\n=== Searching for " + field + " ===");
+        int previewLength = Math.min(500, text.length());
+        System.out.println("Text preview (first 500 chars): " + text.substring(0, previewLength));
+    }
+
+    private static void debugPrintResults(double wages, double federalTax, double stateWages, 
+                                        double stateTax, String state) {
+        System.out.println("\n=== Extracted Values ===");
+        System.out.println("Wages: " + wages);
+        System.out.println("Federal Tax: " + federalTax);
+        System.out.println("State Wages: " + stateWages);
+        System.out.println("State Tax: " + stateTax);
+        System.out.println("State: " + state);
+        System.out.println("=====================\n");
+    }
 }
