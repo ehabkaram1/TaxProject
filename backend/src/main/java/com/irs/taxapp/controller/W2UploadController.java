@@ -54,7 +54,36 @@ public class W2UploadController {
                 .body(new ErrorResponse("File upload failed - " + e.getMessage()));
         }
     }
+
+    @PostMapping("/manual")
+    public ResponseEntity<?> manualW2(@RequestBody W2Data w2Data) {
+        try {
+            // Validate the manually entered data
+            validateW2Data(w2Data);
+            
+            // Return the validated data
+            return ResponseEntity.ok(w2Data);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new ErrorResponse("Invalid W2 data: " + e.getMessage()));
+        }
+    }
+
+    private void validateW2Data(W2Data w2Data) {
+        // Add validation logic here
+        if (w2Data.getEmployerName() == null || w2Data.getEmployerName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Employer name is required");
+        }
+        if (w2Data.getEmployerEIN() == null || !w2Data.getEmployerEIN().matches("\\d{2}-\\d{7}")) {
+            throw new IllegalArgumentException("Valid Employer EIN is required (XX-XXXXXXX)");
+        }
+        // Add more validation as needed
+    }
 }
+
+
+
+
 
 // class ErrorResponse {
 //     private String message;

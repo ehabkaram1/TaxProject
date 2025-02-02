@@ -88,7 +88,8 @@ function App() {
         setFormData,
         error,
         setError,
-        handleFileUpload
+        handleFileUpload,
+        STEPS
       }}
     >
       <Container className="py-5">

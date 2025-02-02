@@ -1,12 +1,37 @@
 // src/components/UploadForm.js
 import React, { useState, useContext } from 'react';
 import { Card, Form, Button } from 'react-bootstrap';
-import { TaxFormContext } from '../App';
+import { TaxFormContext, STEPS } from '../App';
 
 const UploadForm = () => {
-  const { handleFileUpload } = useContext(TaxFormContext);
-  const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+    const { handleFileUpload, setFormData, setCurrentStep } = useContext(TaxFormContext);  // Add these
+    const [dragActive, setDragActive] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+  
+
+  const handleSkip = () => {
+    // Initialize empty W2 data structure
+    setFormData(prev => ({
+      ...prev,
+      w2Data: {
+        employerName: '',
+        employerAddress: '',
+        employeeName: '',
+        employeeAddress: '',
+        employerEIN: '',
+        employeeSSN: '',
+        wages: 0,
+        federalTaxWithheld: 0,
+        stateTaxWithheld: 0,
+        stateWages: 0,
+        state: ''
+      }
+    }));
+    // Move to verify step
+    setCurrentStep(STEPS.VERIFY);
+  };
+
+
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -72,6 +97,17 @@ const UploadForm = () => {
             </Button>
           </Form.Group>
         </div>
+
+        <div className="text-center">
+          <p className="text-muted mb-3">- OR -</p>
+          <Button 
+            variant="secondary" 
+            onClick={handleSkip}
+          >
+            Enter Information Manually
+          </Button>
+        </div>
+
 
         <div className="mt-4">
           <h5>Instructions:</h5>
