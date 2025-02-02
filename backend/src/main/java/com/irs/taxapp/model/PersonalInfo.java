@@ -1,0 +1,51 @@
+package com.irs.taxapp.model;
+
+import java.util.Date;
+
+public class PersonalInfo {
+    // General Personal Information
+    private String firstName;
+    private String lastName;
+    private String ssn;  // or ITIN
+    private String usAddress;
+    private String foreignAddress;
+    private String citizenshipCountry;
+    private String passportCountry;
+    private String passportNumber;
+    private String phoneNumber;
+    private String email;
+    
+    // Immigration Information
+    private String visaType;
+    private Date arrivalDate;
+    private int daysInUS2023;
+    private int daysInUS2022;
+    private int daysInUS2021;
+    
+    // Academic Information
+    private String academicInstitutionName;
+    private String academicInstitutionAddress;
+    private String academicInstitutionPhone;
+    private String academicDirectorName;
+    private String studyProgram;  // e.g., "Masters in Computer Science"
+    
+    // Tax Filing Information
+    private String filingStatus;
+    private boolean canBeClaimed;  // as dependent
+    private boolean hadUSIncomePriorYears;
+    private String scholarshipAmount;
+    private boolean isFirstTimeStudent;
+    
+    // Form 8843 Specific
+    private boolean appliedForResidency;
+    private String residencyApplicationExplanation;
+    
+    // Form 1040NR Specific
+    private String stateOfResidence;
+    private boolean claimingTreatyBenefits;
+    private String treatyCountry;
+    private String treatyArticle;
+
+    // Constructors, getters, and setters...
+    // Add your getters and setters here
+}

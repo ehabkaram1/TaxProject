@@ -6,6 +6,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+
+
+
 public class W2Parser {
 
     public static W2Data parseW2Text(String extractedText) {
@@ -40,6 +44,7 @@ public class W2Parser {
 
         // Extract Employee Name
         employeeName = employerDetails.trim().isEmpty() ? "Not Found" : employerDetails.trim();
+        employeeName = cleanName(employeeName); // Cleaning the name
 
         // Extract identification numbers
         String employerEIN = extractPattern(extractedText, "(\\d{2}-\\d{7})");
@@ -181,6 +186,13 @@ public class W2Parser {
         System.out.println("Text preview (first 500 chars): " + text.substring(0, previewLength));
     }
 
+
+    private static String cleanName(String name) {
+        if (name == null) return "Not Found";
+        // Replace all commas and trim extra spaces
+        return name.replaceAll(",", "").trim().replaceAll("\\s+", " ");
+    }
+    
     private static void debugPrintResults(double wages, double federalTax, double stateWages, 
                                         double stateTax, String state) {
         System.out.println("\n=== Extracted Values ===");

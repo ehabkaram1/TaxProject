@@ -1,6 +1,10 @@
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/utils/W2Parser.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/model/W2Data.java
+/Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/config/CorsConfig.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/utils/W2Extractor.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/W2UploadController.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/TaxFilingApplication.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/HomeController.java
+/Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/PersonalInfoController.java
+/Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/model/PersonalInfo.java
+/Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/common/ErrorResponse.java
