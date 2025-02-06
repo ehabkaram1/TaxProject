@@ -304,7 +304,7 @@ const VerifyData = () => {
       filingStatus: '',
       canBeClaimed: false,
       hadUSIncomePriorYears: false,
-      scholarshipAmount: '',
+      additionalIncome: 0,
       isFirstTimeStudent: true
     }
   });
@@ -859,11 +859,11 @@ const VerifyData = () => {
   </Col>
   <Col md={6}>
     <Form.Group className="mb-3">
-      <Form.Label>Scholarship Amount (if any)</Form.Label>
+      <Form.Label>Additional Income (if any)</Form.Label>
       <Form.Control
         type="number"
-        name="personal.scholarshipAmount"
-        value={localData.personalInfo.scholarshipAmount}
+        name="personal.additionalIncome"
+        value={localData.personalInfo.additionalIncome}
         onChange={handleInputChange}
       />
     </Form.Group>

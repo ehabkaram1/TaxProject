@@ -20,9 +20,9 @@ public class W2Parser {
         String employerDetails = extractEmployerDetails(extractedText, employerName);
         
         // Parse employer and employee details
-        String employerAddress = "Not Found";
-        String employeeName = "Not Found";
-        String employeeAddress = "Not Found";
+        String employerAddress = "";
+        String employeeName = "";
+        String employeeAddress = "";
 
         // Match Employer Address (Ends with 5-digit ZIP)
         Pattern employerPattern = Pattern.compile("(.*?\\d{5})");

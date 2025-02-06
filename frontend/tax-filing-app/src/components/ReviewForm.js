@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Card, Row, Col, Button, Table } from 'react-bootstrap';
 import { TaxFormContext, STEPS } from '../App';
 
@@ -6,11 +6,45 @@ const ReviewForm = () => {
   const { formData, setCurrentStep } = useContext(TaxFormContext);
   const { w2Data, personalInfo } = formData;
 
+  const [taxCalculations, setTaxCalculations] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [calculationError, setCalculationError] = useState(null);
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  };
+
+  useEffect(() => {
+    calculateTaxes();
+  }, [w2Data, personalInfo]); // Run once when component mounts
+  
+  const calculateTaxes = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/tax/calculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          w2Data: w2Data,
+          personalInfo: personalInfo
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to calculate taxes');
+      }
+  
+      const data = await response.json();
+      setTaxCalculations(data);
+    } catch (err) {
+      setCalculationError('Error calculating taxes: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -137,38 +171,70 @@ const ReviewForm = () => {
         </Col>
       </Row>
 
-      {/* Estimated Tax Calculations Section (Placeholder) */}
+      {/* Estimated Tax Calculations Section */}
       <h5 className="border-bottom pb-2 mb-3">Estimated Tax Calculations</h5>
       <Row className="mb-4">
-        <Col md={12}>
-          <div className="bg-light p-3 rounded">
-            <p className="text-muted mb-2">Tax calculations will be available here after backend implementation.</p>
-            <Table striped bordered className="mb-0">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th className="text-end">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Estimated Taxable Income</td>
-                  <td className="text-end">Pending</td>
-                </tr>
-                <tr>
-                  <td>Estimated Federal Tax</td>
-                  <td className="text-end">Pending</td>
-                </tr>
-                <tr>
-                  <td>Estimated State Tax</td>
-                  <td className="text-end">Pending</td>
-                </tr>
-                <tr>
-                  <td>Estimated Refund/Payment Due</td>
-                  <td className="text-end">Pending</td>
-                </tr>
-              </tbody>
-            </Table>
+      <Col md={12}>
+        <div className="bg-light p-3 rounded">
+          {loading ? (
+              <p className="text-muted mb-2">Calculating taxes...</p>
+            ) : calculationError ? (
+              <p className="text-danger mb-2">{calculationError}</p>
+            ) : !taxCalculations ? (
+              <p className="text-muted mb-2">No tax calculations available.</p>
+            ) : (
+              <Table striped bordered className="mb-0">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th className="text-end">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Taxable Income</td>
+                    <td className="text-end">{formatCurrency(taxCalculations.calculations.taxableIncome)}</td>
+                  </tr>
+                  <tr>
+                    <td>Calculated Federal Tax</td>
+                    <td className="text-end">{formatCurrency(taxCalculations.calculations.calculatedFederalTax)}</td>
+                  </tr>
+                  <tr>
+                    <td>Federal Tax Withheld</td>
+                    <td className="text-end">{formatCurrency(taxCalculations.calculations.federalTaxWithheld)}</td>
+                  </tr>
+                  <tr>
+                    <td>Federal Refund/Amount Owed</td>
+                    <td className={`text-end ${taxCalculations.calculations.federalRefundOrOwe >= 0 ? 'text-success' : 'text-danger'}`}>
+                      {formatCurrency(taxCalculations.calculations.federalRefundOrOwe)}
+                      {taxCalculations.calculations.federalRefundOrOwe >= 0 ? ' (Refund)' : ' (Owe)'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Calculated State Tax</td>
+                    <td className="text-end">{formatCurrency(taxCalculations.calculations.calculatedStateTax)}</td>
+                  </tr>
+                  <tr>
+                    <td>State Tax Withheld</td>
+                    <td className="text-end">{formatCurrency(taxCalculations.calculations.stateTaxWithheld)}</td>
+                  </tr>
+                  <tr>
+                    <td>State Refund/Amount Owed</td>
+                    <td className={`text-end ${taxCalculations.calculations.stateRefundOrOwe >= 0 ? 'text-success' : 'text-danger'}`}>
+                      {formatCurrency(taxCalculations.calculations.stateRefundOrOwe)}
+                      {taxCalculations.calculations.stateRefundOrOwe >= 0 ? ' (Refund)' : ' (Owe)'}
+                    </td>
+                  </tr>
+                  <tr className="fw-bold">
+                    <td>Total Refund/Amount Owed</td>
+                    <td className={`text-end ${taxCalculations.calculations.totalRefundOrOwe >= 0 ? 'text-success' : 'text-danger'}`}>
+                      {formatCurrency(taxCalculations.calculations.totalRefundOrOwe ||0)}
+                      {taxCalculations.calculations.totalRefundOrOwe >= 0 ? ' (Refund)' : ' (Owe)'}
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+            )}
           </div>
         </Col>
       </Row>
