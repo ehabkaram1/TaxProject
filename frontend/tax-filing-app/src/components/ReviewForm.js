@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Card, Row, Col, Button, Table } from 'react-bootstrap';
 import { TaxFormContext, STEPS } from '../App';
+import axios from 'axios';
 
 const ReviewForm = () => {
   const { formData, setCurrentStep } = useContext(TaxFormContext);
@@ -46,6 +47,31 @@ const ReviewForm = () => {
       setLoading(false);
     }
   };
+
+
+  const handleProceedToDownload = async () => {
+    // Include tax calculation results in the data sent to the tax-filing endpoint
+    try {
+      const fullData = {
+        ...formData,
+        taxCalculations: taxCalculations.calculations // assuming this structure based on your setup
+      };
+
+      const response = await axios.post('http://localhost:8080/api/tax-filing', fullData);
+      if (response.status === 200) {
+        // Handle success, such as redirecting to a download page or triggering a file download
+        console.log('Form submitted successfully:', response.data);
+        setCurrentStep(STEPS.DOWNLOAD);
+      } else {
+        throw new Error('Failed to submit tax filing');
+      }
+    } catch (error) {
+      console.error('Error submitting tax filing:', error);
+      // Optionally update state to show an error message
+    }
+  };
+
+
 
   return (
     <Card className="p-4">

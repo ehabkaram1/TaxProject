@@ -12,29 +12,29 @@ const DownloadForms = () => {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8080/api/generate/${formType}`, {
+      const response = await fetch(`http://localhost:8080/api/form8843/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData)
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to generate form');
       }
-
+  
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${formType}.pdf`;
+      a.download = 'Form8843.pdf';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      setError(`Error generating ${formType}: ${err.message}`);
+      setError(`Error generating Form 8843: ${err.message}`);
     } finally {
       setDownloading(false);
     }

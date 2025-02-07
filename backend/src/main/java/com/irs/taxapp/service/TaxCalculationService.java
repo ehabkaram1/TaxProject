@@ -71,9 +71,10 @@ public class TaxCalculationService {
 
 
         // ✅ Add additional income (lotteries, bonuses, returns)
-        if (personalInfo.getAdditionalIncome() > 0) {
-            taxableIncome += personalInfo.getAdditionalIncome();
-            results.put("additionalIncome", personalInfo.getAdditionalIncome());
+        double additionalIncome = personalInfo.getAdditionalIncome().orElse(0.0);
+        if (additionalIncome > 0) {
+            taxableIncome += additionalIncome;
+            results.put("additionalIncome", additionalIncome);
         } else {
             results.put("additionalIncome", 0.0);
         }
@@ -109,7 +110,7 @@ public class TaxCalculationService {
         }
 
         // ✅ Add additional income to state taxable income
-        stateTaxableIncome += personalInfo.getAdditionalIncome();
+        stateTaxableIncome += personalInfo.getAdditionalIncome().orElse(0.0);
 
         // ✅ Calculate State Tax
         double stateTax = calculateStateTax(stateTaxableIncome);

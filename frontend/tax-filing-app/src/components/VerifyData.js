@@ -1,7 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import { Form, Button, Card, Row, Col } from 'react-bootstrap';
 import { TaxFormContext, STEPS } from '../App';
 import Select from 'react-select';
+//import axios from 'axios';
 
 
 
@@ -311,86 +312,95 @@ const VerifyData = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (name === 'isInstitutionEmployer') {
-      setIsInstitutionEmployer(checked);
-      if (checked) {
-        setLocalData(prev => ({
-          ...prev,
-          personalInfo: {
-            ...prev.personalInfo,
-            academicInstitutionName: prev.employerName,
-            academicInstitutionAddress: prev.employerAddress
-          }
-        }));
-      }
-      return;
+        setIsInstitutionEmployer(checked);
+        if (checked) {
+            setLocalData(prev => ({
+                ...prev,
+                personalInfo: {
+                    ...prev.personalInfo,
+                    academicInstitutionName: prev.employerName,
+                    academicInstitutionAddress: prev.employerAddress
+                }
+            }));
+        }
+        return;
     }
 
     if (name === 'usAddress') {
-      setLocalData(prev => ({
-        ...prev,
-        employeeAddress: value,
-        personalInfo: {
-          ...prev.personalInfo,
-          usAddress: value
-        }
-      }));
-      return;
+        setLocalData(prev => ({
+            ...prev,
+            employeeAddress: value,
+            personalInfo: {
+                ...prev.personalInfo,
+                usAddress: value
+            }
+        }));
+        return;
     }
 
     if (name.startsWith('personal.')) {
-      const personalField = name.split('.')[1];
-      setLocalData(prev => ({
-        ...prev,
-        personalInfo: {
-          ...prev.personalInfo,
-          [personalField]: type === 'checkbox' ? checked : value
-        }
-      }));
+        const personalField = name.split('.')[1];
+        setLocalData(prev => ({
+            ...prev,
+            personalInfo: {
+                ...prev.personalInfo,
+                [personalField]: type === 'checkbox' ? checked : value
+            }
+        }));
     } else {
-      setLocalData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+        setLocalData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     }
-  };
+};
 
-  const handleSubmit = async (event) => {
+useEffect(() => {
+  // Update the parent formData when localData changes
+  setFormData(prevData => ({
+    ...prevData,
+    w2Data: {
+      employerName: localData.employerName,
+      employerAddress: localData.employerAddress,
+      employeeName: localData.employeeName,
+      employeeAddress: localData.employeeAddress,
+      employerEIN: localData.employerEIN,
+      employeeSSN: localData.employeeSSN,
+      wages: localData.wages,
+      federalTaxWithheld: localData.federalTaxWithheld,
+      stateTaxWithheld: localData.stateTaxWithheld,
+      stateWages: localData.stateWages,
+      state: localData.state
+    },
+    personalInfo: {
+      ...localData.personalInfo,
+      firstName: localData.personalInfo.firstName, // Make sure to use consistent casing
+      lastName: localData.personalInfo.lastName, // Make sure to use consistent casing
+      filingStatus: localData.personalInfo.filingStatus,
+      arrivalDate: localData.personalInfo.arrivalDate,
+      daysInUS: localData.personalInfo.daysInUS2023, // Note this mapping
+      canBeClaimed: localData.personalInfo.canBeClaimed,
+      visaType: localData.personalInfo.visaType,
+      scholarshipAmount: localData.personalInfo.additionalIncome
+    }
+  }));
+}, [localData, setFormData]);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    
-    if (form.checkValidity() === false) {
-      event.stopPropagation();
-      setValidated(true);
-      return;
-    }
-
-    try {
-      // Update global form data
-      setFormData(prev => ({
-        ...prev,
-        w2Data: {
-          employerName: localData.employerName,
-          employerAddress: localData.employerAddress,
-          employeeName: localData.employeeName,
-          employeeAddress: localData.employeeAddress,
-          employerEIN: localData.employerEIN,
-          employeeSSN: localData.employeeSSN,
-          wages: localData.wages,
-          federalTaxWithheld: localData.federalTaxWithheld,
-          stateTaxWithheld: localData.stateTaxWithheld,
-          stateWages: localData.stateWages,
-          state: localData.state
-        },
-        personalInfo: localData.personalInfo
-      }));
-      
-      setCurrentStep(STEPS.REVIEW);
-    } catch (error) {
-      console.error('Error saving information:', error);
+  
+    if (!form.checkValidity()) {
+        event.stopPropagation();
+        setValidated(true); // Trigger validation feedback
+    } else {
+        // Move to the review step where the calculations and final submission will happen
+        setCurrentStep(STEPS.REVIEW);
     }
   };
+  
 
   return (
     <Card className="p-4">
@@ -766,80 +776,105 @@ const VerifyData = () => {
           </Col>
         </Row>
 
-        {/* Academic Information */}
-        <h5 className="border-bottom pb-2 mb-3 mt-4">Academic Information</h5>
-        <Row>
-          <Col md={12}>
-            <Form.Group className="mb-3">
-              <Form.Check
-                type="checkbox"
-                label="My academic institution is my employer"
-                name="isInstitutionEmployer"
-                checked={isInstitutionEmployer}
-                onChange={handleInputChange}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+        /* Academic Information */
+          <h5 className="border-bottom pb-2 mb-3 mt-4">Academic Information</h5>
+          <Row>
+            <Col md={12}>
+              <Form.Group className="mb-3">
+                <Form.Check
+            type="checkbox"
+            label="My academic institution is my employer"
+            name="isInstitutionEmployer"
+            checked={isInstitutionEmployer}
+            onChange={handleInputChange}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Institution Name</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                name="personal.academicInstitutionName"
-                value={localData.personalInfo.academicInstitutionName}
-                onChange={handleInputChange}
-                disabled={isInstitutionEmployer}
-              />
-              {isInstitutionEmployer && (
-                <Form.Text className="text-muted">
-                  Using employer name from W-2
-                </Form.Text>
-              )}
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>NAME- DIRECTOR OF ACADMIC PROGRAM</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                name="personal.studyProgram"
-                value={localData.personalInfo.studyProgram}
-                onChange={handleInputChange}
-                placeholder="e.g., Masters in Computer Science"
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Institution Name</Form.Label>
+                <Form.Control
+            required
+            type="text"
+            name="personal.academicInstitutionName"
+            value={localData.personalInfo.academicInstitutionName}
+            onChange={handleInputChange}
+            disabled={isInstitutionEmployer}
+                />
+                {isInstitutionEmployer && (
+            <Form.Text className="text-muted">
+              Using employer name from W-2
+            </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Institution Address</Form.Label>
+                <Form.Control
+            required
+            type="text"
+            name="personal.academicInstitutionAddress"
+            value={localData.personalInfo.academicInstitutionAddress}
+            onChange={handleInputChange}
+            disabled={isInstitutionEmployer}
+                />
+                {isInstitutionEmployer && (
+            <Form.Text className="text-muted">
+              Using employer address from W-2
+            </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
 
-        <Row>
-          <Col md={12}>
-            <Form.Group className="mb-3">
-              <Form.Label>Institution Address</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                name="personal.academicInstitutionAddress"
-                value={localData.personalInfo.academicInstitutionAddress}
-                onChange={handleInputChange}
-                disabled={isInstitutionEmployer}
-              />
-              {isInstitutionEmployer && (
-                <Form.Text className="text-muted">
-                  Using employer address from W-2
-                </Form.Text>
-              )}
-            </Form.Group>
-          </Col>
-        </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Institution Phone Number</Form.Label>
+                <Form.Control
+            required
+            type="tel"
+            name="personal.academicInstitutionPhone"
+            value={localData.personalInfo.academicInstitutionPhone}
+            onChange={handleInputChange}
+            placeholder="123-456-7890"
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>NAME- DIRECTOR OF ACADMIC PROGRAM</Form.Label>
+                <Form.Control
+                  required
+                  type="text"
+                  name="personal.academicDirectorName"
+                  value={localData.personalInfo.academicDirectorName}
+                  onChange={handleInputChange}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              <Form.Group className="mb-3">
+                <Form.Label>Director's Phone Number</Form.Label>
+                <Form.Control
+                  required
+                  type="tel"
+                  name="personal.academicDirectorPhone"
+                  value={localData.personalInfo.academicDirectorPhone}
+                  onChange={handleInputChange}
+                  placeholder="123-456-7890"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
-        
-
-{/* Tax Filing Information */}
+        {/* Tax Filing Information */}
 <h5 className="border-bottom pb-2 mb-3 mt-4">Tax Filing Information</h5>
 <Row>
   <Col md={6}>

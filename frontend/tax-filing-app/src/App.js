@@ -35,11 +35,25 @@ function App() {
       state: ''
     },
     personalInfo: {
+      firstName: '',
+      lastName: '',
+      ssn: '',
+      foreigAddress: '',
+      usAddress: '',
       filingStatus: '',
-      arrivalDate: '',
-      daysInUS: '',
-      canBeClaimed: false,
       visaType: 'F1',
+      countryOfCitizenship: '',
+      passportcountry: '',
+      passportnumber: '',
+
+      arrivalDate: '',
+      daysInUS2023: '',
+      daysInUS2022: '',
+      daysInUS2021: '',
+      academicInstitutionname: '',
+      academicinstituionaddress: '',
+      acadmicinstituionphonenumber: '',
+      canBeClaimed: false,
       scholarshipAmount: '',
       hadUSIncomePriorYears: false
     }
