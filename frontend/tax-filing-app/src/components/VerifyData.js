@@ -301,6 +301,7 @@ const VerifyData = () => {
       academicInstitutionAddress: '',
       academicInstitutionPhone: '',
       academicDirectorName: '',
+      academicDirectorPhone: '',
       studyProgram: '',
       filingStatus: '',
       canBeClaimed: false,

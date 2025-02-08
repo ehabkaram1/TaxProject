@@ -4,19 +4,29 @@ import { Container, Alert } from 'react-bootstrap';
 // Import the components
 import ProgressBarComponent from './components/ProgressBar';
 import UploadForm from './components/UploadForm';
-import VerifyData from './components/VerifyData';
-import ReviewForm from './components/ReviewForm';  // Import ReviewForm component
+//import VerifyData from './components/VerifyData';
+import ReviewForm from './components/ReviewForm';
 import DownloadForms from './components/DownloadForms';
+// Import new components for split verification steps
+import VerifyW2 from './components/VerifyW2';
+import VerifyPersonal from './components/VerifyPersonal';
+import VerifyImmigration from './components/VerifyImmigration';
+import VerifyAcademic from './components/VerifyAcademic';
+
 // Create the context
 export const TaxFormContext = createContext();
 
-// Define form steps
+// Define form steps (already defined in your code)
 export const STEPS = {
-  UPLOAD: 'upload',
-  VERIFY: 'verify',
-  REVIEW: 'review',
-  DOWNLOAD: 'download'
+  UPLOAD: 'UPLOAD',
+  VERIFY_W2: 'VERIFY_W2',
+  VERIFY_PERSONAL: 'VERIFY_PERSONAL',
+  VERIFY_IMMIGRATION: 'VERIFY_IMMIGRATION',
+  VERIFY_ACADEMIC: 'VERIFY_ACADEMIC',
+  REVIEW: 'REVIEW',
+  DOWNLOAD: 'DOWNLOAD'
 };
+
 
 function App() {
   const [currentStep, setCurrentStep] = useState(STEPS.UPLOAD);
@@ -38,26 +48,28 @@ function App() {
       firstName: '',
       lastName: '',
       ssn: '',
-      foreigAddress: '',
+      foreignAddress: '',  // Changed from foreigAddress
       usAddress: '',
       filingStatus: '',
       visaType: 'F1',
       countryOfCitizenship: '',
-      passportcountry: '',
-      passportnumber: '',
-
+      passportCountry: '',  // Changed from passportcountry
+      passportNumber: '',   // Changed from passportnumber
       arrivalDate: '',
       daysInUS2023: '',
       daysInUS2022: '',
       daysInUS2021: '',
-      academicInstitutionname: '',
-      academicinstituionaddress: '',
-      acadmicinstituionphonenumber: '',
+      academicInstitutionName: '',     // Changed from academicInstitutionname
+      academicInstitutionAddress: '',   // Changed from academicinstituionaddress
+      academicInstitutionPhone: '',     // Changed from acadmicinstituionphonenumber
+      phoneNumber: '',        // Added
+      email: '',             // Added
       canBeClaimed: false,
       scholarshipAmount: '',
       hadUSIncomePriorYears: false
     }
   });
+  
   const [error, setError] = useState(null);
 
   const handleFileUpload = async (file) => {
@@ -86,13 +98,12 @@ function App() {
         ...prev,
         w2Data: data
       }));
-      setCurrentStep(STEPS.VERIFY);
+      setCurrentStep(STEPS.VERIFY_W2);
     } catch (err) {
       console.error('Upload error:', err);
       setError(`Error uploading file: ${err.message}`);
     }
   };
-
   return (
     <TaxFormContext.Provider 
       value={{
@@ -136,14 +147,14 @@ const MainContent = () => {
       )}
       
       {currentStep === STEPS.UPLOAD && <UploadForm />}
-      {currentStep === STEPS.VERIFY && <VerifyData />}
+      {currentStep === STEPS.VERIFY_W2 && <VerifyW2 />}
+      {currentStep === STEPS.VERIFY_PERSONAL && <VerifyPersonal />}
+      {currentStep === STEPS.VERIFY_IMMIGRATION && <VerifyImmigration />}
+      {currentStep === STEPS.VERIFY_ACADEMIC && <VerifyAcademic />}
       {currentStep === STEPS.REVIEW && <ReviewForm />}
       {currentStep === STEPS.DOWNLOAD && <DownloadForms />}
     </div>
   );
 };
-
-// Placeholder component for the remaining step
-//const DownloadForms = () => <div>Download Forms</div>;
 
 export default App;

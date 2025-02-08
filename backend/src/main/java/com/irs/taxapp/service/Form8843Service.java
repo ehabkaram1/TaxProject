@@ -291,8 +291,11 @@ private String getCountryName(String countryCode) {
                     System.out.println("---");
                 }
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-                String formattedDate = dateFormat.format(taxData.getPersonalInfo().getArrivalDate());
+                String formattedDate = "";
+                if (taxData.getPersonalInfo().getArrivalDate() != null) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+                    formattedDate = dateFormat.format(taxData.getPersonalInfo().getArrivalDate());
+                }
 
 
                 // Set a single field to demonstrate functionality
@@ -301,7 +304,7 @@ private String getCountryName(String countryCode) {
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_6[0]", taxData.getPersonalInfo().getSsn());
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_7[0]", taxData.getPersonalInfo().getForeignAddress());
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_8[0]", taxData.getPersonalInfo().getUsAddress());
-                setField(acroForm, "topmostSubform[0].Page1[0].f1_9[0]", taxData.getPersonalInfo().getVisaType() + " " + formattedDate); // have to add date entered
+                setField(acroForm, "topmostSubform[0].Page1[0].f1_9[0]", (taxData.getPersonalInfo().getVisaType() != null ? taxData.getPersonalInfo().getVisaType() : "") + (!formattedDate.isEmpty() ? " " + formattedDate : ""));
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_10[0]", taxData.getPersonalInfo().getVisaType());//this is immigration
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_11[0]", getCountryName(taxData.getPersonalInfo().getCitizenshipCountry()));
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_12[0]", getCountryName(taxData.getPersonalInfo().getPassportCountry()));
@@ -310,13 +313,6 @@ private String getCountryName(String countryCode) {
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_15[0]", String.valueOf(taxData.getPersonalInfo().getDaysInUS2022()));
                 setField(acroForm, "topmostSubform[0].Page1[0].f1_16[0]", String.valueOf(taxData.getPersonalInfo().getDaysInUS2021()));
                 
-                PdfFormField checkBox = acroForm.getField("topmostSubform[0].Page1[0].c1_1[1]");
-                if(checkBox != null) {
-                    checkBox.setValue("Yes");
-                } else {
-                    System.out.println("Checkbox field not found!");
-                }
-
                 String employerName = taxData.getW2Data().getEmployerName();
                 String employerAddress = taxData.getW2Data().getEmployerAddress();
                 String phoneNumber = taxData.getPersonalInfo().getAcademicInstitutionPhone();
@@ -342,27 +338,56 @@ private String getCountryName(String countryCode) {
                     }
                 }
 
-                acroForm.getField("topmostSubform[0].Page1[0].c1_2[1]").setValue("Yes");
-                acroForm.getField("topmostSubform[0].Page1[0].c1_3[1]").setValue("Yes");
+                try {
+                    setField(acroForm, "topmostSubform[0].Page1[0].c1_1[1]", "Yes");
+                    setField(acroForm, "topmostSubform[0].Page1[0].c1_2[1]", "Yes");
+                    setField(acroForm, "topmostSubform[0].Page1[0].c1_3[1]", "Yes");
+                } catch (Exception e) {
+                    System.out.println("Error setting checkbox fields: " + e.getMessage());
+                    // Continue execution - don't let checkbox errors fail the whole process
+                }
+        
 
             } else {
                 System.out.println("No AcroForm found in the PDF.");
+                throw new IOException("Failed to get AcroForm from PDF");
             }
 
 
 
             pdfDocument.close(); // Save changes
+            return baos.toByteArray();
+        } catch (Exception e) {
+            System.err.println("Error generating form: " + e.getMessage());
+            e.printStackTrace();
+            throw new IOException("Failed to generate form: " + e.getMessage(), e);
         }
-        return baos.toByteArray();
     }
 
     private void setField(PdfAcroForm acroForm, String fieldName, String value) {
-        PdfFormField field = acroForm.getField(fieldName);
-        if (field != null) {
-            field.setValue(value);
-            System.out.println("Successfully set field: " + fieldName + " to value: " + value);
-        } else {
-            System.out.println("Field NOT FOUND: " + fieldName);
+        try {
+            // Add null check for value
+            if (value == null) {
+                value = ""; // Convert null to empty string
+            }
+            
+            PdfFormField field = acroForm.getField(fieldName);
+            if (field != null) {
+                // Add debug logging
+                System.out.println("Setting field: " + fieldName + " with value: " + value);
+                try {
+                    field.setValue(value);
+                    System.out.println("Successfully set field: " + fieldName);
+                } catch (Exception e) {
+                    System.err.println("Error setting value for field " + fieldName + ": " + e.getMessage());
+                    // Continue execution instead of failing
+                }
+            } else {
+                System.out.println("Field NOT FOUND: " + fieldName);
+            }
+        } catch (Exception e) {
+            System.err.println("Error in setField for " + fieldName + ": " + e.getMessage());
+            // Don't throw the exception, just log it
         }
     }
 }

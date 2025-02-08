@@ -27,41 +27,51 @@ public class Form8843Controller {
     private Form8843Service form8843Service;
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generateForm8843(@RequestBody TaxFilingData taxData) {
-        try {
-            // Validate input data
-            if (taxData == null || taxData.getPersonalInfo() == null || taxData.getW2Data() == null) {
-                return ResponseEntity
-                    .badRequest()
-                    .body("Invalid tax filing data. Personal info and W2 data are required.");
-            }
-
-            // Generate PDF
-            byte[] pdfBytes = form8843Service.generateForm(taxData);
-            
-            // Prepare HTTP headers for PDF download
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDisposition(
-                ContentDisposition.builder("attachment")
-                    .filename("Form8843.pdf")
-                    .build()
-            );
-
-            // Return PDF as downloadable file
-            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-        } catch (IOException e) {
-            // Log the error (consider using a logger)
+public ResponseEntity<?> generateForm8843(@RequestBody TaxFilingData taxData) {
+    try {
+        System.out.println("Attempting to generate Form 8843...");
+        
+        // Validate input data
+        if (taxData == null || taxData.getPersonalInfo() == null || taxData.getW2Data() == null) {
+            System.err.println("Invalid tax filing data received");
             return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error generating Form 8843: " + e.getMessage());
-        } catch (Exception e) {
-            // Catch any unexpected errors
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Unexpected error: " + e.getMessage());
+                .badRequest()
+                .body("Invalid tax filing data. Personal info and W2 data are required.");
         }
+
+        // Generate PDF
+        byte[] pdfBytes = form8843Service.generateForm(taxData);
+        
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            throw new IOException("Generated PDF is empty");
+        }
+
+        // Prepare HTTP headers for PDF download
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+            ContentDisposition.builder("attachment")
+                .filename("Form8843.pdf")
+                .build()
+        );
+
+        // Return PDF as downloadable file
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        
+    } catch (IOException e) {
+        System.err.println("Error generating Form 8843: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error generating Form 8843: " + e.getMessage());
+    } catch (Exception e) {
+        System.err.println("Unexpected error: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Unexpected error: " + e.getMessage());
     }
+}
 
     // Optional: Add a method to validate form data before generation
     @PostMapping("/validate")
