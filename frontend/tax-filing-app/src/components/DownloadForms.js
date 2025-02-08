@@ -12,29 +12,49 @@ const DownloadForms = () => {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8080/api/form8843/generate`, {
+      let endpoint;
+      let filename;
+      
+      switch(formType) {
+        case '8843':
+          endpoint = 'form8843/generate';
+          filename = 'Form8843.pdf';
+          break;
+        case 'il1040':
+          endpoint = 'il1040/generate';
+          filename = 'IL-1040.pdf';
+          break;
+        case '1040nr':
+          endpoint = 'form1040nr/generate';
+          filename = 'Form1040NR.pdf';
+          break;
+        default:
+          throw new Error('Unknown form type');
+      }
+
+      const response = await fetch(`http://localhost:8080/api/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData)
       });
-  
+
       if (!response.ok) {
-        throw new Error('Failed to generate form');
+        throw new Error(`Failed to generate ${filename}`);
       }
-  
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Form8843.pdf';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      setError(`Error generating Form 8843: ${err.message}`);
+      setError(`Error generating ${formType.toUpperCase()}: ${err.message}`);
     } finally {
       setDownloading(false);
     }
@@ -57,20 +77,20 @@ const DownloadForms = () => {
               <h5 className="mb-3">Available Forms</h5>
               <ListGroup>
                 <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  Form 1040-NR
+                  Form 8843
                   <Button 
                     variant="primary" 
-                    onClick={() => handleDownload('1040nr')}
+                    onClick={() => handleDownload('8843')}
                     disabled={downloading}
                   >
                     {downloading ? 'Generating...' : 'Download'}
                   </Button>
                 </ListGroup.Item>
                 <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                  Form 8843
+                  Form 1040NR
                   <Button 
                     variant="primary" 
-                    onClick={() => handleDownload('8843')}
+                    onClick={() => handleDownload('1040nr')}
                     disabled={downloading}
                   >
                     {downloading ? 'Generating...' : 'Download'}
@@ -100,19 +120,22 @@ const DownloadForms = () => {
                   1. Review all downloaded forms for accuracy
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  2. Sign and date Form 1040-NR on page 2
+                  2. Sign and date Form 8843
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  3. Sign and date Form 8843
+                  3. Sign and date Form 1040NR on page 2
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  4. Attach your W-2 form(s)
+                  4. Sign and date Form IL-1040
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  5. Make copies of all documents for your records
+                  5. Attach your W-2 form(s)
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  6. Mail forms to the appropriate IRS address by April 15, 2024
+                  6. Make copies of all documents for your records
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  7. Mail forms to the appropriate IRS address by April 15, 2024
                 </ListGroup.Item>
               </ListGroup>
             </Card.Body>
@@ -146,9 +169,9 @@ const DownloadForms = () => {
         </Button>
         <Button 
           variant="success"
-          onClick={() => alert('Thank you for using our tax filing assistant!')}
+          onClick={() => setCurrentStep(STEPS.UPLOAD)}
         >
-          Finish
+          Start New Filing
         </Button>
       </div>
     </Card>

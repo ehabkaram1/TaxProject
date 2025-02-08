@@ -131,11 +131,14 @@ public class PersonalInfo {
     }
 
     public String getAcademicDirectorName() {
-        // TODO Auto-generated method stub
         return academicDirectorName;
     }
 
     public String getAcademicDirectorPhone() {
         return academicDirectorPhone;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 }
