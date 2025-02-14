@@ -75,8 +75,8 @@ public class PersonalInfo {
     }
 
 
-    public Optional<Double> getAdditionalIncome() {
-        return Optional.ofNullable(additionalIncome);
+    public Double getAdditionalIncome() {
+        return additionalIncome;
     }
     
     public boolean isCanBeClaimed() {
@@ -140,5 +140,9 @@ public class PersonalInfo {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

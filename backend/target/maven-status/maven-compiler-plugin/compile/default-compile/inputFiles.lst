@@ -3,6 +3,7 @@
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/TaxFilingController.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/Form8843Controller.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/TaxFilingApplication.java
+/Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/service/Form1040NRService.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/IL1040Controller.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/TaxCalculationController.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/model/TaxFilingData.java
@@ -15,4 +16,5 @@
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/service/TaxTreatyService.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/service/Form8843Service.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/model/PersonalInfo.java
+/Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/controller/Form1040NRController.java
 /Users/ehabkaram/Documents/TaxProject/backend/src/main/java/com/irs/taxapp/common/ErrorResponse.java
