@@ -57,11 +57,16 @@ public class W2UploadController {
 
     @PostMapping("/manual")
     public ResponseEntity<?> manualW2(@RequestBody W2Data w2Data) {
+        System.out.println("\n=== Received W2 Data from iOS ===");
+        System.out.println("Employer Name: " + w2Data.getEmployerName());
+        System.out.println("Employee Name: " + w2Data.getEmployeeName());
+        System.out.println("Employee Address: " + w2Data.getEmployeeAddress());
+
+        // ... print other fields
+        System.out.println("==================================\n");
+        
         try {
-            // Validate the manually entered data
             validateW2Data(w2Data);
-            
-            // Return the validated data
             return ResponseEntity.ok(w2Data);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
