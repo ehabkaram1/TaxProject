@@ -145,4 +145,155 @@ public class PersonalInfo {
     public String getEmail() {
         return email;
     }
+
+
+    // Add these setter methods to your PersonalInfo class
+
+public void setFirstName(String firstName) {
+    this.firstName = firstName;
+}
+
+public void setLastName(String lastName) {
+    this.lastName = lastName;
+}
+
+public void setSsn(String ssn) {
+    this.ssn = ssn;
+}
+
+public void setUsAddress(String usAddress) {
+    this.usAddress = usAddress;
+}
+
+public void setForeignAddress(String foreignAddress) {
+    this.foreignAddress = foreignAddress;
+}
+
+public void setCitizenshipCountry(String citizenshipCountry) {
+    this.citizenshipCountry = citizenshipCountry;
+}
+
+public void setPassportCountry(String passportCountry) {
+    this.passportCountry = passportCountry;
+}
+
+public void setPassportNumber(String passportNumber) {
+    this.passportNumber = passportNumber;
+}
+
+public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+}
+
+public void setEmail(String email) {
+    this.email = email;
+}
+
+public void setVisaType(String visaType) {
+    this.visaType = visaType;
+}
+
+public void setArrivalDate(Date arrivalDate) {
+    this.arrivalDate = arrivalDate;
+}
+
+public void setDaysInUS2023(int daysInUS2023) {
+    this.daysInUS2023 = daysInUS2023;
+}
+
+public void setDaysInUS2022(int daysInUS2022) {
+    this.daysInUS2022 = daysInUS2022;
+}
+
+public void setDaysInUS2021(int daysInUS2021) {
+    this.daysInUS2021 = daysInUS2021;
+}
+
+public void setAcademicInstitutionName(String academicInstitutionName) {
+    this.academicInstitutionName = academicInstitutionName;
+}
+
+public void setAcademicInstitutionAddress(String academicInstitutionAddress) {
+    this.academicInstitutionAddress = academicInstitutionAddress;
+}
+
+public void setAcademicInstitutionPhone(String academicInstitutionPhone) {
+    this.academicInstitutionPhone = academicInstitutionPhone;
+}
+
+public void setAcademicDirectorName(String academicDirectorName) {
+    this.academicDirectorName = academicDirectorName;
+}
+
+public void setAcademicDirectorPhone(String academicDirectorPhone) {
+    this.academicDirectorPhone = academicDirectorPhone;
+}
+
+public void setFilingStatus(String filingStatus) {
+    this.filingStatus = filingStatus;
+}
+
+public void setCanBeClaimed(boolean canBeClaimed) {
+    this.canBeClaimed = canBeClaimed;
+}
+
+public void setHadUSIncomePriorYears(boolean hadUSIncomePriorYears) {
+    this.hadUSIncomePriorYears = hadUSIncomePriorYears;
+}
+
+public void setAdditionalIncome(Double additionalIncome) {
+    this.additionalIncome = additionalIncome;
+}
+
+public void setFirstTimeStudent(boolean isFirstTimeStudent) {
+    this.isFirstTimeStudent = isFirstTimeStudent;
+}
+
+public void setAppliedForResidency(boolean appliedForResidency) {
+    this.appliedForResidency = appliedForResidency;
+}
+
+public void setResidencyApplicationExplanation(String residencyApplicationExplanation) {
+    this.residencyApplicationExplanation = residencyApplicationExplanation;
+}
+
+public void setStateOfResidence(String stateOfResidence) {
+    this.stateOfResidence = stateOfResidence;
+}
+
+public void setClaimingTreatyBenefits(boolean claimingTreatyBenefits) {
+    this.claimingTreatyBenefits = claimingTreatyBenefits;
+}
+
+public void setTreatyCountry(String treatyCountry) {
+    this.treatyCountry = treatyCountry;
+}
+
+public void setTreatyArticle(String treatyArticle) {
+    this.treatyArticle = treatyArticle;
+}
+
+public String getStudyProgram() {
+    return studyProgram;
+}
+
+public void setStudyProgram(String studyProgram) {
+    this.studyProgram = studyProgram;
+}
+
+public boolean isHadUSIncomePriorYears() {
+    return hadUSIncomePriorYears;
+}
+
+public boolean isFirstTimeStudent() {
+    return isFirstTimeStudent;
+}
+
+public boolean isAppliedForResidency() {
+    return appliedForResidency;
+}
+
+public boolean isClaimingTreatyBenefits() {
+    return claimingTreatyBenefits;
+}
 }
