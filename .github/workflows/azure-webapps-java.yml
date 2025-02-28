@@ -23,7 +23,7 @@ jobs:
         run: cd backend
           
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: cd backend && mvn clean package -DskipTests
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
