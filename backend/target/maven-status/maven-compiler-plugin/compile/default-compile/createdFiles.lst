@@ -4,10 +4,12 @@ com/irs/taxapp/utils/W2Extractor.class
 com/irs/taxapp/service/IndiaTreatyInfo.class
 com/irs/taxapp/service/Form8843Service.class
 com/irs/taxapp/service/Form1040NRService.class
+com/irs/taxapp/controller/PersonalInfoController.class
 com/irs/taxapp/controller/HomeController.class
 com/irs/taxapp/controller/TaxCalculationResponse.class
 com/irs/taxapp/utils/W2Parser.class
 com/irs/taxapp/config/CorsConfig.class
+com/irs/taxapp/controller/ImmigrationController.class
 com/irs/taxapp/model/W2Data.class
 com/irs/taxapp/service/IL1040Service.class
 com/irs/taxapp/controller/Form8843Controller.class
@@ -16,9 +18,11 @@ com/irs/taxapp/model/TaxFilingData.class
 com/irs/taxapp/controller/TaxCalculationController.class
 com/irs/taxapp/controller/Form1040NRController.class
 com/irs/taxapp/controller/W2UploadController.class
+com/irs/taxapp/config/WebConfig.class
 com/irs/taxapp/common/ErrorResponse.class
 com/irs/taxapp/controller/TaxFilingController.class
 com/irs/taxapp/service/Form8843Service$1.class
 com/irs/taxapp/controller/TaxCalculationRequest.class
 com/irs/taxapp/TaxFilingApplication.class
 com/irs/taxapp/service/TaxTreatyService.class
+com/irs/taxapp/controller/AcademicInfoController.class
