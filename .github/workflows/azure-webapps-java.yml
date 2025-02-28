@@ -53,3 +53,5 @@ jobs:
           app-name: 'taxmate'  # Replace with your app name
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: './java-app/backend/target/*.jar'
+          publish-method: MSDeploy  # Using MSDeploy instead of Slot Name
+
