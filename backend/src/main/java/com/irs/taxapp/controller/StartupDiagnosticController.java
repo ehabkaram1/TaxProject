@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,8 +43,9 @@ public class StartupDiagnosticController {
     }
 
     @GetMapping("/health")
-    public String healthCheck() {
-        logger.info("Health check endpoint called");
-        return "Application is running - " + System.currentTimeMillis();
+    public Map<String, String> health() {
+        return Map.of("status", "UP", 
+                      "timestamp", new Date().toString(),
+                      "environment", System.getenv("WEBSITE_SITE_NAME") != null ? "Azure" : "Local");
     }
 }
