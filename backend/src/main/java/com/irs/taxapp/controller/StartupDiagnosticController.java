@@ -43,9 +43,11 @@ public class StartupDiagnosticController {
     }
 
     @GetMapping("/health")
-    public Map<String, String> health() {
-        return Map.of("status", "UP", 
-                      "timestamp", new Date().toString(),
-                      "environment", System.getenv("WEBSITE_SITE_NAME") != null ? "Azure" : "Local");
+    public Map<String, Object> health() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "UP");
+        response.put("time", new Date().toString());
+        response.put("port", System.getenv("PORT"));
+        return response;
     }
 }
