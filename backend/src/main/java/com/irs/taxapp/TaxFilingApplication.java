@@ -13,10 +13,10 @@ public class TaxFilingApplication {
         SpringApplication.run(TaxFilingApplication.class, args);
     }
 
-    @GetMapping("/")
-    public String home() {
-        return "Application is running!";
-    }
+    // @GetMapping("/")
+    // public String home() {
+    //     return "Application is running!";
+    // }
 
     @GetMapping("/health")
     public String health() {
