@@ -42,7 +42,7 @@ public class StartupDiagnosticController {
         return diagnostics;
     }
 
-    @GetMapping("/health")
+    @GetMapping("/system-health")
     public Map<String, Object> health() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
