@@ -122,24 +122,15 @@ public class W2Parser {
 
     // Your previous working methods for employer/employee extraction
     private static String extractEmployerName(String text) {
-        System.out.println("=== Employer Name Extraction Diagnostics ===");
-    System.out.println("Full text length: " + text.length());
-    
-    // Detailed line ending and formatting analysis
-    System.out.println("Line Ending Analysis:");
-    System.out.println("Contains \\r\\n: " + text.contains("\r\n"));
-    System.out.println("Contains \\n: " + text.contains("\n"));
+        text = text.replaceAll("[�\\r\\n]+", " ")  // Replace special chars and line breaks with space
+        .replaceAll("\\s+", " ")         // Normalize whitespaces
+        .trim();
+
+System.out.println("=== Normalized Text Diagnostics ===");
+System.out.println("Normalized text length: " + text.length());
+System.out.println("Normalized text preview: " + text.substring(0, Math.min(500, text.length())));
     
     // Print first few lines with special character visualization
-    String[] lines = text.split("\\n");
-    System.out.println("\nFirst 10 Lines (with special chars):");
-    for (int i = 0; i < Math.min(10, lines.length); i++) {
-        String visibleLine = lines[i]
-            .replace("\r", "\\r")
-            .replace("\n", "\\n")
-            .replace(" ", "·");
-        System.out.println(i + ": " + visibleLine);
-    }
     
         
         Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
