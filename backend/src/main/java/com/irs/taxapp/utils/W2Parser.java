@@ -120,66 +120,97 @@ public class W2Parser {
         return "Not Found";
     }
 
-    // Your previous working methods for employer/employee extraction
-    private static String extractEmployerName(String text) {
-        text = text.replaceAll("[�\\r\\n]+", " ")  // Replace special chars and line breaks with space
-        .replaceAll("\\s+", " ")         // Normalize whitespaces
-        .trim();
+//     // Your previous working methods for employer/employee extraction
+//     private static String extractEmployerName(String text) {
+//         text = text.replaceAll("[�\\r\\n]+", " ")  // Replace special chars and line breaks with space
+//         .replaceAll("\\s+", " ")         // Normalize whitespaces
+//         .trim();
 
-System.out.println("=== Normalized Text Diagnostics ===");
-System.out.println("Normalized text length: " + text.length());
-System.out.println("Normalized text preview: " + text.substring(0, Math.min(500, text.length())));
+// System.out.println("=== Normalized Text Diagnostics ===");
+// System.out.println("Normalized text length: " + text.length());
+// System.out.println("Normalized text preview: " + text.substring(0, Math.min(500, text.length())));
     
-    // Print first few lines with special character visualization
+//     // Print first few lines with special character visualization
     
         
-        Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
-        Matcher m = p.matcher(text);
+//         Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
+//         Matcher m = p.matcher(text);
         
-        if (m.find()) {
-            String match = m.group().trim();
-            System.out.println("Match found: " + match);
-            System.out.println("Match start index: " + m.start());
-            System.out.println("Match end index: " + m.end());
-            return match;
-        } else {
-            System.out.println("No match found for employer name");
-            return "Not Found";
-        }
-    }
+//         if (m.find()) {
+//             String match = m.group().trim();
+//             System.out.println("Match found: " + match);
+//             System.out.println("Match start index: " + m.start());
+//             System.out.println("Match end index: " + m.end());
+//             return match;
+//         } else {
+//             System.out.println("No match found for employer name");
+//             return "Not Found";
+//         }
+//     }
     
 
-    private static String extractEmployerDetails(String text, String employerName) {
-        System.out.println("=== Employer Details Extraction Diagnostics ===");
-        System.out.println("Employer Name: " + employerName);
+//     private static String extractEmployerDetails(String text, String employerName) {
+//         System.out.println("=== Employer Details Extraction Diagnostics ===");
+//         System.out.println("Employer Name: " + employerName);
         
-        if (employerName.equals("Not Found")) {
-            return "Not Found";
-        }
+//         if (employerName.equals("Not Found")) {
+//             return "Not Found";
+//         }
     
-        System.out.println("First pattern attempt:");
-        Pattern p = Pattern.compile("(?i)" + Pattern.quote(employerName) + "\\s*\\n(.*?\\n.*?\\n.*?)(?=\\n\\d{2}-\\d{7})", Pattern.DOTALL);
-        Matcher m = p.matcher(text);
+//         System.out.println("First pattern attempt:");
+//         Pattern p = Pattern.compile("(?i)" + Pattern.quote(employerName) + "\\s*\\n(.*?\\n.*?\\n.*?)(?=\\n\\d{2}-\\d{7})", Pattern.DOTALL);
+//         Matcher m = p.matcher(text);
     
-        if (m.find()) {
-            String details = m.group(1).trim().replace("\n", ", ");
-            System.out.println("First pattern match: " + details);
-            return details;
-        }
+//         if (m.find()) {
+//             String details = m.group(1).trim().replace("\n", ", ");
+//             System.out.println("First pattern match: " + details);
+//             return details;
+//         }
     
-        System.out.println("Alternate pattern attempt:");
-        Pattern altPattern = Pattern.compile("(?<=c\\s+Employer's\\s+name,\\s+address,\\s+and\\s+ZIP\\s+code\\n)(.*?\\n.*?\\n)", Pattern.DOTALL);
-        Matcher altMatcher = altPattern.matcher(text);
+//         System.out.println("Alternate pattern attempt:");
+//         Pattern altPattern = Pattern.compile("(?<=c\\s+Employer's\\s+name,\\s+address,\\s+and\\s+ZIP\\s+code\\n)(.*?\\n.*?\\n)", Pattern.DOTALL);
+//         Matcher altMatcher = altPattern.matcher(text);
     
-        if (altMatcher.find()) {
-            String details = altMatcher.group(1).trim().replace("\n", ", ");
-            System.out.println("Alternate pattern match: " + details);
-            return details;
-        }
+//         if (altMatcher.find()) {
+//             String details = altMatcher.group(1).trim().replace("\n", ", ");
+//             System.out.println("Alternate pattern match: " + details);
+//             return details;
+//         }
     
-        System.out.println("Employer Address NOT FOUND for: " + employerName);
+//         System.out.println("Employer Address NOT FOUND for: " + employerName);
+//         return "Not Found";
+//     }
+
+
+// Your previous working methods for employer/employee extraction
+private static String extractEmployerName(String text) {
+    Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
+    Matcher m = p.matcher(text);
+    return m.find() ? m.group().trim() : "Not Found";
+}
+
+private static String extractEmployerDetails(String text, String employerName) {
+    if (employerName.equals("Not Found")) {
         return "Not Found";
     }
+
+    Pattern p = Pattern.compile("(?i)" + Pattern.quote(employerName) + "\\s*\\n(.*?\\n.*?\\n.*?)(?=\\n\\d{2}-\\d{7})", Pattern.DOTALL);
+    Matcher m = p.matcher(text);
+
+    if (m.find()) {
+        return m.group(1).trim().replace("\n", ", ");
+    }
+
+    Pattern altPattern = Pattern.compile("(?<=c\\s+Employer's\\s+name,\\s+address,\\s+and\\s+ZIP\\s+code\\n)(.*?\\n.*?\\n)", Pattern.DOTALL);
+    Matcher altMatcher = altPattern.matcher(text);
+
+    if (altMatcher.find()) {
+        return altMatcher.group(1).trim().replace("\n", ", ");
+    }
+
+    System.out.println("Employer Address NOT FOUND for: " + employerName);
+    return "Not Found";
+}
 
     // Helper methods from new code
     private static String extractPattern(String text, String regex) {
