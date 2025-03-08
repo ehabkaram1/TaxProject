@@ -122,30 +122,54 @@ public class W2Parser {
 
     // Your previous working methods for employer/employee extraction
     private static String extractEmployerName(String text) {
+        System.out.println("=== Employer Name Extraction Diagnostics ===");
+        System.out.println("Full text length: " + text.length());
+        System.out.println("First 500 characters:\n" + text.substring(0, Math.min(500, text.length())));
+        
         Pattern p = Pattern.compile("(?<=\\n)[A-Z ]{3,}(?=\\n\\d)");
         Matcher m = p.matcher(text);
-        return m.find() ? m.group().trim() : "Not Found";
+        
+        if (m.find()) {
+            String match = m.group().trim();
+            System.out.println("Match found: " + match);
+            System.out.println("Match start index: " + m.start());
+            System.out.println("Match end index: " + m.end());
+            return match;
+        } else {
+            System.out.println("No match found for employer name");
+            return "Not Found";
+        }
     }
+    
 
     private static String extractEmployerDetails(String text, String employerName) {
+        System.out.println("=== Employer Details Extraction Diagnostics ===");
+        System.out.println("Employer Name: " + employerName);
+        
         if (employerName.equals("Not Found")) {
             return "Not Found";
         }
-
+    
+        System.out.println("First pattern attempt:");
         Pattern p = Pattern.compile("(?i)" + Pattern.quote(employerName) + "\\s*\\n(.*?\\n.*?\\n.*?)(?=\\n\\d{2}-\\d{7})", Pattern.DOTALL);
         Matcher m = p.matcher(text);
-
+    
         if (m.find()) {
-            return m.group(1).trim().replace("\n", ", ");
+            String details = m.group(1).trim().replace("\n", ", ");
+            System.out.println("First pattern match: " + details);
+            return details;
         }
-
+    
+        System.out.println("Alternate pattern attempt:");
         Pattern altPattern = Pattern.compile("(?<=c\\s+Employer's\\s+name,\\s+address,\\s+and\\s+ZIP\\s+code\\n)(.*?\\n.*?\\n)", Pattern.DOTALL);
         Matcher altMatcher = altPattern.matcher(text);
-
+    
         if (altMatcher.find()) {
-            return altMatcher.group(1).trim().replace("\n", ", ");
+            String details = altMatcher.group(1).trim().replace("\n", ", ");
+            System.out.println("Alternate pattern match: " + details);
+            return details;
         }
-
+    
         System.out.println("Employer Address NOT FOUND for: " + employerName);
         return "Not Found";
     }
@@ -206,6 +230,6 @@ public class W2Parser {
 
 
 
-    
+
 }
 
