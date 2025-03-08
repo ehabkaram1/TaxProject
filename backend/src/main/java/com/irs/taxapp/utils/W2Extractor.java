@@ -14,10 +14,10 @@ public class W2Extractor {
     private static final Logger logger = LoggerFactory.getLogger(W2Extractor.class);
 
     public static String extractTextFromPDF(File pdfFile) {
-        logger.info("=== PDF EXTRACTION DIAGNOSTICS ===");
-        logger.info("Java Version: {}", System.getProperty("java.version"));
-        logger.info("OS Name: {}", System.getProperty("os.name"));        
-        logger.info("Starting PDF text extraction for file: {}", pdfFile.getName());
+        System.out.println("=== PDF EXTRACTION DIAGNOSTICS ===");
+        System.out.println("Java Version: {}"+System.getProperty("java.version"));
+        System.out.println("OS Name: {}"+ System.getProperty("os.name"));        
+        System.out.println("Starting PDF text extraction for file: {}"+pdfFile.getName());
 
         try (PDDocument document = PDDocument.load(pdfFile)) {
             logger.info("PDF loaded successfully. Number of pages: {}", document.getNumberOfPages());
